@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Mockery</title>
+  <style>
+    html {
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      font-feature-settings: "kern" 1;
+      text-size-adjust: 100%;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
+    }
+
+    h2 {
+      margin: 0;
+      font-weight: 400;
+    }
+
+    p {
+      margin-bottom: 0;
+      color: #888;
+    }
+
+    .icon {
+      margin-right: .25rem;
+    }
+
+    .profile__container {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid #ccc;
+      margin: 1rem;
+      padding: .5rem;
+    }
+
+    .profile__avatar {
+      display: block;
+      height: 100px;
+      width: 100px;
+    }
+
+    .profile__right {
+      margin: 0 1rem;
+    }
+
+    .profile__details {
+      display: flex;
+      align-items: center;
+    }
+
+    .profile__details span {
+      display: flex;
+      align-items: center;
+      margin-right: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <button id="refresh">Fetch</button>
+
+  <script src="./lib/index.js"></script>
+  <script>
+    window.mockery = new MockeryWorker({
+      rules: [
+        {
+          url: /api.github.com\/users/,
+          // get(req, res) {
+          //   res.status(200);
+          //   res.json({
+          //     name: 'John Maverick',
+          //     login: 'mockery.rocks',
+          //     public_repos: 14
+          //   });
+          // },
+          // post(req) {
+
+          // },
+          method: 'GET',
+          res: {
+            status: 200,
+            body: {
+              name: 'John Maverick',
+              login: 'john.maverick',
+              public_repos: 14
+            }
+          }
+        },
+        {
+          url: /api.github.com\/users/,
+          method: 'POST',
+          res: {
+            status: 500,
+            body: {
+              error: 'You shall not pass!'
+            }
+          }
+        }
+      ]
+    });
+  </script>
+  <script>
+    const root = document.getElementById('root');
+
+    function fetchGithubUser() {
+      root.innerHTML = '';
+
+      fetch('https://api.github.com/users/kettanaito')
+        .then(res => res.json())
+        .then((res) => {
+
+          const repoIcon = '<svg aria-hidden="true" class="icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M4 9H3V8h1v1zm0-3H3v1h1V6zm0-2H3v1h1V4zm0-2H3v1h1V2zm8-1v12c0 .55-.45 1-1 1H6v2l-1.5-1.5L3 16v-2H1c-.55 0-1-.45-1-1V1c0-.55.45-1 1-1h10c.55 0 1 .45 1 1zm-1 10H1v2h2v-1h3v1h5v-2zm0-10H2v9h9V1z"></path></svg>';
+
+          const html = `
+            <div class="profile__container">
+              <div class="profile__left">
+              </div>
+              <div class="profile__right">
+                <h2>${res.name}</h2>
+                <p class="profile__details">
+                  <span>${res.login}</span>
+                  <span>${repoIcon} ${res.public_repos}</span>
+                </p>
+              </div>
+            </div>
+          `;
+
+          root.innerHTML = html;
+        });
+
+        fetch('https://api.github.com/users/kettanaito', {
+          method: 'POST'
+        });
+    }
+    fetchGithubUser();
+
+    document.getElementById('refresh').addEventListener('click', function () {
+      fetchGithubUser();
+    });
+  </script>
+</body>
+</html>
