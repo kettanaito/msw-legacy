@@ -72,13 +72,15 @@
       rules: [
         {
           url: /api.github.com\/users/,
-          get: req => ({
-            body: {
-              name: 'John Maverick',
-              login: 'mockery.rocks',
-              public_repos: 9000
-            }
-          }),
+          get: (req) => {
+            return {
+              body: {
+                name: 'John Maverick',
+                login: 'mockery.rocks',
+                public_repos: 9000
+              }
+            };
+          },
           post: req => ({
             status: 500,
             body: {

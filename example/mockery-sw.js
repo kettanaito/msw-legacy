@@ -9,7 +9,7 @@ self.addEventListener('activate', function (event) {
 });
 
 /**
- * Pass Mockery options to the Service worker.
+ * Pass Mockery options to the worker.
  */
 self.addEventListener('message', function (event) {
   const message = event.data;
@@ -27,8 +27,8 @@ self.addEventListener('message', function (event) {
 
 /**
  * Fetch listener.
- * Listen to the fetch requests from the page, intercept the once
- * matching the mocking groups and respond to them from the SW.
+ * Listen to the fetch requests from the page, intercept those
+ * matching the mocking rules and respond to them by the worker.
  */
 self.addEventListener('fetch', function (event) {
   const mockery = self.__mockery__;
@@ -74,7 +74,7 @@ self.addEventListener('fetch', function (event) {
         console.log('URL:', request.url);
         console.log('Original request:', request);
         console.log('Matched rule:', rule.url);
-        console.log('Mocked payload:', response.body);
+        console.log('Mocked payload:', mockedResponse.body);
       console.groupEnd();
 
       return event.respondWith(response);
