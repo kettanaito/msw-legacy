@@ -72,36 +72,19 @@
       rules: [
         {
           url: /api.github.com\/users/,
-          // get(req, res) {
-          //   res.status(200);
-          //   res.json({
-          //     name: 'John Maverick',
-          //     login: 'mockery.rocks',
-          //     public_repos: 14
-          //   });
-          // },
-          // post(req) {
-
-          // },
-          method: 'GET',
-          res: {
-            status: 200,
+          get: req => ({
             body: {
               name: 'John Maverick',
-              login: 'john.maverick',
-              public_repos: 14
+              login: 'mockery.rocks',
+              public_repos: 9000
             }
-          }
-        },
-        {
-          url: /api.github.com\/users/,
-          method: 'POST',
-          res: {
+          }),
+          post: req => ({
             status: 500,
             body: {
-              error: 'You shall not pass!'
+              errorMessage: 'Foo'
             }
-          }
+          })
         }
       ]
     });

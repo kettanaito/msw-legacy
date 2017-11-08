@@ -39,18 +39,18 @@ self.addEventListener('fetch', function (event) {
 
   rules.forEach(function (rule) {
     const urlMatches = request.url.match(rule.url);
-    const methodMatches = Array.isArray(rule.method)
-      ? rule.method.includes(request.method)
-      : (request.method === rule.method);
+    const responseGetter = rule[request.method.toLowerCase()];
 
-    if (urlMatches && methodMatches) {
+    if (urlMatches && responseGetter) {
+      const mockedResponse = eval(`(${responseGetter})`)(request);
+
       const resHeaders = Object.assign({
         'Content-Type': 'application/json',
         Mocked: true
-      }, rule.res.headers);
+      }, mockedResponse.headers);
 
-      const mockedResponse = new Response(JSON.stringify(rule.res.body), Object.assign({
-        status: rule.res.status,
+      const response = new Response(JSON.stringify(mockedResponse.body), Object.assign({
+        status: mockedResponse.status,
         headers: resHeaders
       }));
 
@@ -68,16 +68,16 @@ self.addEventListener('fetch', function (event) {
       console.groupCollapsed(
         `%c${timestamp} %cmockery %c@ ${request.method} ${formattedUrl}`,
         'color:gray;font-weight:normal;',
-        `color:${colors[mockedResponse.status]}`,
+        `color:${colors[response.status]}`,
         'color:black'
       );
         console.log('URL:', request.url);
         console.log('Original request:', request);
         console.log('Matched rule:', rule.url);
-        console.log('Mocked payload:', mockedResponse.body);
+        console.log('Mocked payload:', response.body);
       console.groupEnd();
 
-      return event.respondWith(mockedResponse);
+      return event.respondWith(response);
     }
   });
 

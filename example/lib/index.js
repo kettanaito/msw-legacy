@@ -8,6 +8,22 @@ const MockeryWorker = function (options) {
 
   this.swFilePath = './mockery-sw.js';
   this.options = options;
+  this.encodedOptions = Object.assign({}, options, {
+    rules: options.rules.map((rule) => {
+      /**
+       * Convert all method functions to strings.
+       * At the moment it is impossible to pass a function / object containing function
+       * via "postMessage". That would result into error.
+       */
+      ['get', 'post', 'put', 'options', 'delete'].forEach((method) => {
+        if (rule.hasOwnProperty(method)) {
+          rule[method] = rule[method].toString();
+        }
+      });
+
+      return rule;
+    })
+  });
 
   return this;
 };
@@ -22,21 +38,20 @@ MockeryWorker.prototype.getSW = function () {
 /**
  * Registers a new instance of Mockery Service Worker.
  */
-MockeryWorker.prototype.start = function () {
-  this.getSW()
-    .then((sw) => {
-      if (sw) {
-        throw new Error('Cannot start another instance of Mockery Service Worker. Active instance of Service Worker is already running.');
-      }
-    })
-    .then(() => {
-      navigator.serviceWorker.register(this.swFilePath, { scope: '/' }).then((reg) => {
-        const sw = reg.active || reg.installing || reg.waiting;
+MockeryWorker.prototype.start = async function () {
+  const existingSW = await this.getSW();
+  if (existingSW) {
+    throw new Error('Cannot start another instance of Mockery Service Worker. Active instance of Service Worker is already running.');
+  }
 
-        sw.postMessage({
-          type: 'init',
-          options: this.options
-        });
+  navigator.serviceWorker.register(this.swFilePath, { scope: '/' })
+    .then((reg) => {
+      const sw = reg.active || reg.installing || reg.waiting;
+
+      /* Send the options to Service Worker */
+      sw.postMessage({
+        type: 'init',
+        options: this.encodedOptions
       });
     }).catch(function (error) {
       throw new Error(`Registration of Mockery SW failed. ${error}`);
@@ -46,11 +61,10 @@ MockeryWorker.prototype.start = function () {
 /**
  * Stops currently running instance of Mockery Service Worker.
  */
-MockeryWorker.prototype.stop = function () {
-  this.getSW().then((sw) => {
-    sw.unregister();
-    return true;
-  }).catch(function (error) {
-    throw new Error(`Terminating Mockery SW failed. ${error}`);
-  });
+MockeryWorker.prototype.stop = async function () {
+  const existingSW = await this.getSW();
+  if (!existingSW) return;
+
+  existingSW.unregister();
+  return true;
 };
