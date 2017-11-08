@@ -32,14 +32,7 @@ self.addEventListener('message', function (event) {
  */
 self.addEventListener('fetch', function (event) {
   const mockery = self.__mockery__;
-
-  console.log('self', self);
-  console.log('mockery', mockery);
-
-  if (!mockery) {
-    console.warn('Fetch received, but no mockery options are present:', self);
-    return;
-  }
+  if (!mockery) return;
 
   const request = event.request;
   const rules = mockery.options.rules;
@@ -56,15 +49,10 @@ self.addEventListener('fetch', function (event) {
         Mocked: true
       }, rule.res.headers);
 
-      console.log('rule.res.body', rule.res.body);
-      console.log('resHeaders', resHeaders);
-
       const mockedResponse = new Response(JSON.stringify(rule.res.body), Object.assign({
         status: rule.res.status,
         headers: resHeaders
       }));
-
-      console.log('mockedResponse', mockedResponse);
 
       const date = new Date();
       const timestamp = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
@@ -94,20 +82,3 @@ self.addEventListener('fetch', function (event) {
   });
 
 });
-
-// rules.forEach(function (rule) {
-//   if (req.url.match(rule.url) && req.method === rule.method) {
-//     const mockedHeaders = Object.assign({}, {
-//       'Content-Type': 'application/json',
-//     }, rule.res.headers, {
-//       Mocked: true
-//     });
-
-//     const mockedResponse = new Response(JSON.stringify(rule.res.body), {
-//       status: rule.res.status,
-//       headers: mockedHeaders
-//     });
-
-//     return event.respondWith(mockedResponse);
-//   }
-// });

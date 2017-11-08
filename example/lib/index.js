@@ -9,36 +9,8 @@ const MockeryWorker = function (options) {
   this.swFilePath = './mockery-sw.js';
   this.options = options;
 
-  /* Register Mockery Service Worker */
-  // this.start();
-
   return this;
 };
-
-MockeryWorker.prototype.handleRequest = function (req) {
-  if (!this.options || !this.options.rules) return;
-
-  this.options.rules.forEach(function (rule) {
-    const urlMatches = req.url.match(rule.url);
-    const methodMatches = Array.isArray(rule.method)
-      ? rule.method.includes(req.method)
-      : (req.method === rule.method);
-
-    if (urlMatches && methodMatches) {
-      const resHeaders = Object.assign({
-        'Content-Type': 'application/json',
-        Mocked: true
-      }, rules.res.headers);
-
-      const res = Object.assign({}, rules.res, resHeaders);
-
-      return {
-        rule,
-        res
-      };
-    }
-  });
-}
 
 /**
  * Retrieves the currently active instance of Mockery Service Worker.
