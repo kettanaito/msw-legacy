@@ -1,7 +1,7 @@
 /**
  * Mockery constructor.
  */
-const MockeryWorker = function (options) {
+const MockeryClient = function (options) {
   if (!('serviceWorker' in navigator)) {
     throw new Error('Service workers are not supported in the current browser.');
   }
@@ -31,14 +31,14 @@ const MockeryWorker = function (options) {
 /**
  * Retrieves the currently active instance of Mockery Service Worker.
  */
-MockeryWorker.prototype.getSW = function () {
+MockeryClient.prototype.getSW = function () {
   return navigator.serviceWorker.getRegistration(this.swFilePath);
 }
 
 /**
  * Registers a new instance of Mockery Service Worker.
  */
-MockeryWorker.prototype.start = async function () {
+MockeryClient.prototype.start = async function () {
   const existingSW = await this.getSW();
   if (existingSW) {
     throw new Error('Cannot start another instance of Mockery Service Worker. Active instance of Service Worker is already running.');
@@ -61,7 +61,7 @@ MockeryWorker.prototype.start = async function () {
 /**
  * Stops currently running instance of Mockery Service Worker.
  */
-MockeryWorker.prototype.stop = async function () {
+MockeryClient.prototype.stop = async function () {
   const existingSW = await this.getSW();
   if (!existingSW) return;
 

@@ -66,9 +66,10 @@
   <div id="root"></div>
   <button id="refresh">Fetch</button>
 
-  <script src="./lib/index.js"></script>
+  <script src="../lib/index.js"></script>
+  <script>const MockeryClientConstructor = MockeryClient.default;</script>
   <script>
-    window.mockery = new MockeryWorker({
+    window.mockery = new MockeryClientConstructor({
       rules: [
         {
           url: /api.github.com\/users/,

@@ -1,18 +1,22 @@
 {
   "name": "mock-api",
   "version": "0.1.0",
-  "description": "Mock API intersepter",
-  "main": "index.js",
+  "description": "Mock API responses using production URLs and no change from the client.",
+  "module": "src/index.ts",
+  "main": "lib/index.js",
   "scripts": {
     "start": "./node_modules/babel-cli/bin/babel-node.js example/index.js",
-    "test": "test"
+    "test": "test",
+    "build": "NODE_ENV=production webpack"
   },
   "author": "Artem Zakharchenko",
   "license": "MIT",
   "devDependencies": {
+    "awesome-typescript-loader": "^3.4.1",
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.6.1",
-    "express": "^4.16.2"
-  },
-  "dependencies": {}
+    "express": "^4.16.2",
+    "typescript": "^2.6.2",
+    "webpack": "^3.8.1"
+  }
 }

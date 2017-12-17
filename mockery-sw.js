@@ -5,7 +5,7 @@ self.addEventListener('install', function (event) {
 self.addEventListener('activate', function (event) {
   /* Update SW for all clients */
   event.waitUntil(self.clients.claim());
-  console.log('%cMockery is activated!', 'color: blue');
+  console.log('%cMockeryClient is activated!', 'color:green');
 });
 
 /**
@@ -72,13 +72,12 @@ self.addEventListener('fetch', function (event) {
         'color:black'
       );
         console.log('URL:', request.url);
-        console.log('Original request:', request);
-        console.log('Matched rule:', rule.url);
-        console.log('Mocked payload:', mockedResponse.body);
+        console.log('Request:', request);
+        console.log('Rule:', rule.url);
+        console.log('Mocked response:', mockedResponse.body);
       console.groupEnd();
 
       return event.respondWith(response);
     }
   });
-
 });
