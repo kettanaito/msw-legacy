@@ -70,18 +70,17 @@
   <script>const MockeryClientConstructor = MockeryClient.default;</script>
   <script>
     window.mockery = new MockeryClientConstructor({
+      serviceWorkerFilepath: '../mockery-sw.js',
       rules: [
         {
           url: /api.github.com\/users/,
-          get: (req) => {
-            return {
-              body: {
-                name: 'John Maverick',
-                login: 'mockery.rocks',
-                public_repos: 9000
-              }
-            };
-          },
+          get: (req) => ({
+            body: {
+              name: 'John Maverick',
+              login: 'mockery.rocks',
+              public_repos: 9000
+            }
+          }),
           post: req => ({
             status: 500,
             body: {
@@ -92,6 +91,7 @@
       ]
     });
   </script>
+
   <script>
     const root = document.getElementById('root');
 

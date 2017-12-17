@@ -1,8 +1,7 @@
 import { MockeryOptions } from './types';
 export default class MockeryClient {
-    serviceWorkerFilepath: any;
-    instance: ServiceWorkerRegistration;
     options: MockeryOptions;
+    instance: ServiceWorkerRegistration;
     constructor(options: MockeryOptions);
     /**
      * Starts the service worker for Mockery client.

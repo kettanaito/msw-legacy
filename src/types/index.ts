@@ -14,5 +14,6 @@ export type MockeryRule<RequestMethodHandlers> = {
 }
 
 export type MockeryOptions<RequestMethodHandlers = MockeryResponse> = {
+  serviceWorkerFilepath: string,
   rules: MockeryRule<RequestMethodHandlers>[]
 }

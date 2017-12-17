@@ -9,7 +9,7 @@ self.addEventListener('activate', function (event) {
 });
 
 /**
- * Pass Mockery options to the worker.
+ * Message handlers.
  */
 self.addEventListener('message', function (event) {
   const message = event.data;

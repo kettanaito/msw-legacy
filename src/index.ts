@@ -1,21 +1,19 @@
 import { MockeryOptions } from './types';
 
-interface ServiceWorkerContainer extends EventTarget {
-  getRegistration(clientUrl?: string): Promise<ServiceWorkerRegistration | undefined>;
-}
+const restMethods = ['get', 'post', 'put', 'options', 'delete'];
 
 /**
  * Encodes the given options.
- * Converts the response getters (get, post, etc.) from function declarations to strings.
+ * Converts the response getters (get, post, etc.) from "rules" declarations to strings.
  * This is because there is no way to pass a function to service worker using "postMessage".
  */
 function encodeOptions(options: MockeryOptions): MockeryOptions<string> {
   const clonedOptions: MockeryOptions<any> = Object.assign({}, options);
 
   const encodedRules = clonedOptions.rules.map((rule) => {
-    ['get', 'post', 'put', 'options', 'delete'].forEach((method) => {
-      if (rule.hasOwnProperty(method)) {
-        rule[method] = rule[method].toString();
+    Object.keys(rule).forEach((ruleKey) => {
+      if (restMethods.includes(ruleKey)) {
+        rule[ruleKey] = rule[ruleKey].toString();
       }
     });
 
@@ -23,14 +21,14 @@ function encodeOptions(options: MockeryOptions): MockeryOptions<string> {
   });
 
   return {
+    ...clonedOptions,
     rules: encodedRules
   };
 }
 
 export default class MockeryClient {
-  serviceWorkerFilepath: any;
-  instance: ServiceWorkerRegistration;
   options: MockeryOptions;
+  instance: ServiceWorkerRegistration;
 
   constructor(options: MockeryOptions) {
     /* Check if service worker is supported */
@@ -38,7 +36,6 @@ export default class MockeryClient {
       throw new Error('Cannot create an instance of Mockery client: Service workers are not supported in the current environment (browser).');
     }
 
-    this.serviceWorkerFilepath = './mockery-sw.js';
     this.options = options;
 
     return this;
@@ -50,14 +47,12 @@ export default class MockeryClient {
    */
   async start() {
     /* Check if the service worker already exists */
-    // const existingServiceWorker = await this.getServiceWorker();
-
     if (this.instance) {
       throw new Error(`Starting Mockery client failed. Respective service worker is already running. ${this.instance}`);
     }
 
     /* Register a new Service worker instance */
-    return navigator.serviceWorker.register(this.serviceWorkerFilepath, { scope: '/' })
+    return navigator.serviceWorker.register(this.options.serviceWorkerFilepath, { scope: '/' })
       .then((reg) => {
         const serviceWorker = reg.active || reg.installing || reg.waiting;
 
@@ -78,8 +73,6 @@ export default class MockeryClient {
    * Stops currently running instance of Mockery Service Worker.
    */
   async stop() {
-    // const serviceWorker = await this.getServiceWorker();
-
     if (!this.instance) {
       return console.warn('Cannot stop Mockery service worker: no service worker is running.');
     }
